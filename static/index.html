@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+        .loading-spinner {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #007BFF;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Prediction App</h1>
+        <input type="text" id="inputText" placeholder="Enter text">
+        <button onclick="getPrediction()">Predict</button>
+        <div class="loading-spinner" id="loadingSpinner" style="margin-top: 20px;"></div>
+        
+        <div class="output" id="output" style="margin-bottom: 40px; margin-top: 10px;"></div>
+
+        <div class="info-box" style="background-color: #e8f4f8; padding: 20px; border-left: 5px solid #007BFF; margin: 20px 0; text-align: left; border-radius: 8px;">
+            <h2 style="margin-top: 0; color: #007BFF;">Article Content Classifier</h2>
+            <p style="margin: 10px 0; color: #333; font-size: 16px;">
+            This advanced classifier categorizes text into one of the following five categories:
+            </p>
+            <ul style="margin: 10px 0; padding-left: 20px; color: #555; font-size: 16px;">
+            <li>Business</li>
+            <li>Entertainment</li>
+            <li>Technology</li>
+            <li>Sports</li>
+            <li>Political</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        async function getPrediction() {
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const output = document.getElementById('output');
+            try {
+                loadingSpinner.style.display = 'block';
+                const inputText = document.getElementById('inputText').value;
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: inputText })
+                });
+                const data = await response.json();
+
+                const prediction = data.prediction;
+                const capitalizedPrediction = prediction.charAt(0).toUpperCase() + prediction.slice(1);
+                
+                output.innerHTML = `Prediction: ${capitalizedPrediction}`;
+            } catch (error) {
+                output.innerHTML = `Error: ${error.message}`;
+            } finally {
+                loadingSpinner.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
